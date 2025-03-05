@@ -2,12 +2,12 @@ package com.example.demo.service;
 
 import com.example.demo.exception.SenhaInvalidaException;
 import org.springframework.stereotype.Service;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ValidacaoSenhaService {
-    private static final Set<Character> CARACTERES_ESPECIAIS = Set.of('!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+');
+    private static final List<Character> CARACTERES_ESPECIAIS_LISTA = List.of('!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+');
 
     public boolean validarSenha(String senha) {
         if (senha == null || senha.isBlank()) {
@@ -21,16 +21,26 @@ public class ValidacaoSenhaService {
         }
 
         boolean temDigito = false, temMinuscula = false, temMaiuscula = false, temEspecial = false;
-        Set<Character> caracteresUnicos = new HashSet<>();
+        List<Character> caracteresUnicos = new ArrayList<>();
 
-        for (char ch : senha.toCharArray()) {
-            if (!caracteresUnicos.add(ch)) {
-                throw new SenhaInvalidaException("Senha inválida: caractere repetido -> '" + ch + "'");
+        for (char caracter : senha.toCharArray()) {
+            if (caracteresUnicos.contains(caracter)) {
+                throw new SenhaInvalidaException(String.format("Senha inválida: caractere repetido -> '%s'", caracter));
             }
-            if (Character.isDigit(ch)) temDigito = true;
-            if (Character.isLowerCase(ch)) temMinuscula = true;
-            if (Character.isUpperCase(ch)) temMaiuscula = true;
-            if (CARACTERES_ESPECIAIS.contains(ch)) temEspecial = true;
+            caracteresUnicos.add(caracter);
+
+            if (Character.isDigit(caracter)) {
+                temDigito = true;
+            }
+            if (Character.isLowerCase(caracter)) {
+                temMinuscula = true;
+            }
+            if (Character.isUpperCase(caracter)) {
+                temMaiuscula = true;
+            }
+            if (CARACTERES_ESPECIAIS_LISTA.contains(caracter)) {
+                temEspecial = true;
+            }
         }
 
         if (!(temDigito && temMinuscula && temMaiuscula && temEspecial)) {
@@ -40,4 +50,3 @@ public class ValidacaoSenhaService {
         return true;
     }
 }
-
